@@ -1,0 +1,7 @@
+name = radius
+description = Support module for Radius
+package = Radius
+
+files[] = radius.module
+core = 7.x
+

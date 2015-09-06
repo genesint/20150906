@@ -1,0 +1,113 @@
+<?php
+
+module_load_include('inc', 'radius', 'common');
+function radius_menu() {
+  $query = "select nid from node where type='menu'";
+  $records = db_query($query);
+  $items = array();
+  $page_arguments = array();
+  foreach ($records as $record) {
+    $node = node_load($record->nid);
+    if (!empty($node->field_page_arguments['und'])) {
+      $page_arguments = explode(",", $node->field_page_arguments['und'][0]['value']);
+    }
+    $items[$node->field_url['und'][0]['value']] = array(
+      'title' => $node->title,
+      'access callback' => TRUE,
+      'page callback' => $node->field_page_callback['und'][0]['value'],
+      'page arguments' => $page_arguments,
+      'file' => $node->field_file['und'][0]['value'],
+    );
+  }
+  return $items;
+}
+
+function radius_page_alter() {
+  global $user;
+  $user_id = $user->uid;
+  $rpath = request_path();
+  # core dataTables css
+  drupal_add_css('sites/all/libraries/DataTables/media/css/jquery.dataTables.min.css');
+  # core dataTables js
+  drupal_add_js('sites/all/libraries/DataTables/media/js/jquery.dataTables.min.js');
+  # bootstrap js
+  drupal_add_js('sites/all/libraries/DataTables/media/js/bootstrap/dataTables.bootstrap.js');
+  # jquery-ui css
+  //drupal_add_css('sites/all/libraries/DataTables/media/css/jquery-ui/dataTables.jqueryui.css');
+  # jquery-ui js
+  //drupal_add_js('sites/all/libraries/DataTables/media/js/jquery-ui/dataTables.jqueryui.js');
+
+  drupal_add_library('system', 'ui.datepicker');
+  if (!user_is_logged_in()) {
+    if (request_path() != 'user') {
+      drupal_goto('user', array());
+    }
+  }
+  $no_header_pages = array(
+    "node/add/tenant",
+    "node/add/account",
+    "node/add/billing",
+    "node/add/expense",
+    "node/add/income",
+    "node/add/unit",
+    "node/add/backups",
+    "node/add/unit-type",
+    "node/add/unit-group",
+  );
+  if (in_array($rpath, $no_header_pages) and $user_id <> 1) {
+    #drupal_add_css('sites/all/themes/Sarai/css/iframe.css');
+  }
+  if (preg_match('/node\/[0-9]+\/edit/', $rpath) and $user_id <> 1) {
+    #drupal_add_css('sites/all/themes/Sarai/css/iframe.css');
+  }
+  if (preg_match('/node\/[0-9]+\/delete/', $rpath) and $user_id <> 1) {
+    #drupal_add_css('sites/all/themes/Sarai/css/iframe.css');
+  }
+
+
+}
+
+function radius_theme() {
+  return array(
+    'dashboard' => array(
+      'template' => 'dashboard',
+      'variables' => array('title' => '', 'contents' => array())
+    ),
+    'product_node_form' => array(
+      'render element' => 'form',
+      'template' => 'product-node-form',
+      'path' => 'sites/all/modules/custom/radius/forms',
+    ),
+    'product-grid' => array(
+      'template' => 'product-grid',
+      'variables' => array('title' => '', 'contents' => array()),
+      'path' => 'sites/all/modules/custom/radius/views/',
+    ),
+  );
+}
+
+function radius_form_alter(&$form, &$form_state, $form_id) {
+    global $user;
+    $user_id = $user->uid;
+    if ($user_id == 1) {
+        return;
+    }
+    $forms = array(
+        "product_node_form",
+
+    );
+    if (in_array($form_id, $forms)) {
+        #$form["body"]['#access'] = 0;
+        #$form["title"]['#access'] = 0;
+        $form['actions']["delete"]['#access'] = 0;
+        $form['actions']["preview"]['#access'] = 0;
+        $prefix = str_replace('_node_form', '', $form_id);
+        $form['actions']['submit']['#submit'][] = $prefix . "_submit_handler";
+        #$form['#validate'][] = $prefix . "_validate_handler";
+    }
+}
+
+function product_submit_handler(&$form, &$form_state)
+{
+    $form_state['redirect'] = 'product-grid';
+}

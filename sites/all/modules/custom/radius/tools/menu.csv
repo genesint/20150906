@@ -1,0 +1,6 @@
+title|title callback|title arguments|description|page callback|page arguments|access callback|access arguments|file|file path|weight|menu_name|type|url
+Dashboard||||router||||router.inc||||MENU_NORMAL_ITEM|dashboard
+Product grid||||router||||router.inc||||MENU_NORMAL_ITEM|product-grid
+Product grid execute||||product_grid_exec||||grids/product-grid-exec.inc||||MENU_NORMAL_ITEM|product-grid-exec
+Delete product||||delete_product||||operations.inc||||MENU_NORMAL_ITEM|delete-product
+
