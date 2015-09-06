@@ -36,7 +36,7 @@ drupal_set_title($title);
   <div class="col-md-3">
     <div id='rental-tool'>
       <div class="btn-group">
-        <a class="btn btn-primary" href="#"><i class="fa fa-tasks fa-fw"></i>&nbsp;Actions</a>
+        <a class="btn btn-primary" href="#"><i class="fa fa-tasks fa-fw"></i>&nbsp;Menu</a>
         <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
            href="#">
           <span class="fa fa-caret-down"></span></a>
